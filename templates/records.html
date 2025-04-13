@@ -1,0 +1,96 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Medical Records - VitalHub HMS{% endblock %}
+
+{% block header %}Medical Records{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form action="{{ url_for('records') }}" method="get" class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" name="search" value="{{ search_query }}" placeholder="Search records...">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <div class="btn-group">
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-funnel"></i> Filter
+            </button>
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-download"></i> Export
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-light py-3">
+        <ul class="nav nav-pills card-header-pills">
+            <li class="nav-item">
+                <a class="nav-link {% if record_type == 'all' %}active{% endif %}" href="{{ url_for('records', search=search_query) }}">All Records</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if record_type == 'Lab Results' %}active{% endif %}" href="{{ url_for('records', search=search_query, type='Lab Results') }}">Lab Results</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if record_type == 'X-Ray' or record_type == 'MRI Scan' %}active{% endif %}" href="{{ url_for('records', search=search_query, type='X-Ray') }}">Imaging</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if record_type == 'Prescription' %}active{% endif %}" href="{{ url_for('records', search=search_query, type='Prescription') }}">Prescriptions</a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Record ID</th>
+                        <th>Patient</th>
+                        <th>Record Type</th>
+                        <th>Date</th>
+                        <th>Department</th>
+                        <th>Doctor</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if records %}
+                        {% for record in records %}
+                            <tr>
+                                <td>{{ record.id }}</td>
+                                <td>{{ record.patient_name }}</td>
+                                <td>{{ record.record_type }}</td>
+                                <td>{{ record.date }}</td>
+                                <td>{{ record.department }}</td>
+                                <td>{{ record.doctor }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ record.status }}">
+                                        {{ record.status.capitalize() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">No records found</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Showing {{ records|length }} of {{ records|length }} records</span>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Settings - VitalHub HMS{% endblock %}
+
+{% block header %}Settings{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-3">
+        <div class="card mb-4">
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action active">General Settings</a>
+                <a href="#" class="list-group-item list-group-item-action">User Account</a>
+                <a href="#" class="list-group-item list-group-item-action">Notifications</a>
+                <a href="#" class="list-group-item list-group-item-action">Security</a>
+                <a href="#" class="list-group-item list-group-item-action">Backup & Restore</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-9">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">General Settings</h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="hospitalName" class="form-label">Hospital Name</label>
+                        <input type="text" class="form-control" id="hospitalName" value="VitalHub General Hospital">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hospitalAddress" class="form-label">Hospital Address</label>
+                        <textarea class="form-control" id="hospitalAddress" rows="2">123 Medical Drive, Healthcare City, HC 12345</textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="contactPhone" class="form-label">Contact Phone</label>
+                            <input type="tel" class="form-control" id="contactPhone" value="(555) 123-4567">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="contactEmail" class="form-label">Contact Email</label>
+                            <input type="email" class="form-control" id="contactEmail" value="info@vitalhub.com">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="timezone" class="form-label">Timezone</label>
+                        <select class="form-select" id="timezone">
+                            <option value="EST" selected>Eastern Standard Time (EST)</option>
+                            <option value="CST">Central Standard Time (CST)</option>
+                            <option value="MST">Mountain Standard Time (MST)</option>
+                            <option value="PST">Pacific Standard Time (PST)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dateFormat" class="form-label">Date Format</label>
+                        <select class="form-select" id="dateFormat">
+                            <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                        </select>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h6>System Preferences</h6>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="autoLogout" checked>
+                        <label class="form-check-label" for="autoLogout">Auto-logout after 30 minutes of inactivity</label>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="emailNotifications" checked>
+                        <label class="form-check-label" for="emailNotifications">Send email notifications</label>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="smsNotifications">
+                        <label class="form-check-label" for="smsNotifications">Send SMS notifications</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="reset" class="btn btn-light me-md-2">Reset</button>
+                        <button type="button" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

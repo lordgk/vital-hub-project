@@ -1,0 +1,38 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Departments - VitalHub HMS{% endblock %}
+
+{% block header %}Departments{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    {% if departments %}
+        {% for dept in departments %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">{{ dept.name }}</h5>
+                        <p class="text-muted small mb-3">Head: {{ dept.head }}</p>
+                        
+                        <p class="mb-3">{{ dept.description }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-light text-dark">
+                                <i class="bi bi-people me-1"></i> {{ dept.staff_count }} Staff
+                            </span>
+                            <button class="btn btn-sm btn-primary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No departments found.
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

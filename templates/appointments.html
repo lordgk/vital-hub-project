@@ -1,0 +1,223 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Appointments - VitalHub HMS{% endblock %}
+
+{% block header %}Appointments{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="appointmentSearch" placeholder="Search appointments...">
+        </div>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{{ url_for('create_appointment') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> New Appointment
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-light py-3">
+        <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+                <button class="nav-link active" data-filter="all">All</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-filter="scheduled">Scheduled</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-filter="completed">Completed</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-filter="cancelled">Cancelled</button>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if appointments %}
+                        {% for appointment in appointments %}
+                            <tr class="appointment-row" data-status="{{ appointment.status }}">
+                                <td>{{ appointment.id }}</td>
+                                <td>{{ appointment.patient_name }}</td>
+                                <td>{{ appointment.doctor_name }}</td>
+                                <td>{{ appointment.date }}</td>
+                                <td>{{ appointment.time }}</td>
+                                <td>{{ appointment.type }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ appointment.status }}">
+                                        {{ appointment.status.capitalize() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary view-appointment" data-id="{{ appointment.id }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">No appointments found</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Showing {{ appointments|length }} appointments</span>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Modal for appointment details -->
+<div class="modal fade" id="appointmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Appointment Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="appointmentDetails">
+                    <!-- Will be filled with AJAX -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success">Update Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter appointments
+        const filterButtons = document.querySelectorAll('[data-filter]');
+        const appointmentRows = document.querySelectorAll('.appointment-row');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                // Update active tab
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show/hide rows based on filter
+                appointmentRows.forEach(row => {
+                    if (filter === 'all' || row.getAttribute('data-status') === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Search functionality
+        const searchInput = document.getElementById('appointmentSearch');
+        searchInput.addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            
+            appointmentRows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                if (rowText.includes(searchValue)) {
+                    if (row.style.display !== 'none' || document.querySelector('[data-filter].active').getAttribute('data-filter') === 'all' || 
+                        row.getAttribute('data-status') === document.querySelector('[data-filter].active').getAttribute('data-filter')) {
+                        row.style.display = '';
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // View appointment details
+        const viewButtons = document.querySelectorAll('.view-appointment');
+        const appointmentModal = new bootstrap.Modal(document.getElementById('appointmentModal'));
+        
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const appointmentId = this.getAttribute('data-id');
+                
+                // In a real app, this would be an AJAX call to get appointment details
+                // For this demo, we're using mock data
+                const appointmentRow = this.closest('tr');
+                const appointmentData = {
+                    id: appointmentId,
+                    patient: appointmentRow.cells[1].textContent,
+                    doctor: appointmentRow.cells[2].textContent,
+                    date: appointmentRow.cells[3].textContent,
+                    time: appointmentRow.cells[4].textContent,
+                    type: appointmentRow.cells[5].textContent,
+                    status: appointmentRow.cells[6].textContent.trim(),
+                    notes: "Patient notes would be loaded from the server."
+                };
+                
+                // Fill modal with appointment data
+                const detailsContainer = document.getElementById('appointmentDetails');
+                detailsContainer.innerHTML = `
+                    <div class="mb-3">
+                        <strong>Appointment ID:</strong> ${appointmentData.id}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Patient:</strong> ${appointmentData.patient}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Doctor:</strong> ${appointmentData.doctor}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Date:</strong> ${appointmentData.date}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Time:</strong> ${appointmentData.time}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Type:</strong> ${appointmentData.type}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Status:</strong> ${appointmentData.status}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Notes:</strong>
+                        <p>${appointmentData.notes}</p>
+                    </div>
+                `;
+                
+                appointmentModal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

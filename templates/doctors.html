@@ -1,0 +1,98 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Doctors - VitalHub HMS{% endblock %}
+
+{% block header %}Doctors{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="doctorSearch" placeholder="Search doctors...">
+        </div>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <button class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> New Doctor
+        </button>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% if doctors %}
+        {% for doctor in doctors %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <img src="{{ doctor.image }}" class="rounded-circle" width="60" height="60" alt="{{ doctor.name }}">
+                            </div>
+                            <div class="ms-3">
+                                <h5 class="card-title mb-0">{{ doctor.name }}</h5>
+                                <p class="text-primary mb-0">{{ doctor.specialty }}</p>
+                                <p class="text-muted small">{{ doctor.department }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex flex-column gap-1 mb-3">
+                            <div class="d-flex">
+                                <span class="text-muted me-2" style="width: 100px;">Experience:</span>
+                                <span>{{ doctor.experience }} years</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted me-2" style="width: 100px;">Qualification:</span>
+                                <span>{{ doctor.qualification }}</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted me-2" style="width: 100px;">Email:</span>
+                                <span>{{ doctor.email }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-3">
+                            <div>
+                                <small class="text-muted">Schedule: {{ doctor.schedule }}</small>
+                            </div>
+                            <button class="btn btn-sm btn-primary">
+                                View Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No doctors found.
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Doctor search functionality
+        const searchInput = document.getElementById('doctorSearch');
+        const doctorCards = document.querySelectorAll('.col-md-6.col-lg-4');
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            
+            doctorCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                if (cardText.includes(searchValue)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

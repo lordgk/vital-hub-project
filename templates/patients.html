@@ -1,0 +1,99 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Patients - VitalHub HMS{% endblock %}
+
+{% block header %}Patients{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="patientSearch" placeholder="Search patients...">
+        </div>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <button class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> New Patient
+        </button>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% if patients %}
+        {% for patient in patients %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="card-title mb-1">{{ patient.name }}</h5>
+                            <span class="status-badge status-{{ patient.status }}">
+                                {{ patient.status.capitalize() }}
+                            </span>
+                        </div>
+                        <p class="text-muted small mb-3">ID: {{ patient.id }}</p>
+                        
+                        <div class="d-flex flex-column gap-2 mb-3">
+                            <div class="d-flex">
+                                <span class="text-muted me-2" style="width: 80px;">Age:</span>
+                                <span>{{ patient.age }}</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted me-2" style="width: 80px;">Gender:</span>
+                                <span>{{ patient.gender }}</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted me-2" style="width: 80px;">Blood:</span>
+                                <span>{{ patient.blood_type }}</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="text-muted me-2" style="width: 80px;">Phone:</span>
+                                <span>{{ patient.phone }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end mt-3">
+                            <button class="btn btn-sm btn-outline-secondary me-2">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-primary">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No patients found.
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Patient search functionality
+        const searchInput = document.getElementById('patientSearch');
+        const patientCards = document.querySelectorAll('.col-md-6.col-lg-4');
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            
+            patientCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                if (cardText.includes(searchValue)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,100 @@
+
+{% extends 'base.html' %}
+
+{% block title %}New Appointment - VitalHub HMS{% endblock %}
+
+{% block header %}Create New Appointment{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Appointment Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('create_appointment') }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="patient" class="form-label">Patient</label>
+                            <select id="patient" name="patient_id" class="form-select" required>
+                                <option value="">Select Patient</option>
+                                {% for patient in patients %}
+                                    <option value="{{ patient.id }}">{{ patient.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="doctor" class="form-label">Doctor</label>
+                            <select id="doctor" name="doctor_id" class="form-select" required>
+                                <option value="">Select Doctor</option>
+                                {% for doctor in doctors %}
+                                    <option value="{{ doctor.id }}">{{ doctor.name }} ({{ doctor.specialty }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" id="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="time" class="form-label">Time</label>
+                            <input type="time" id="time" name="time" class="form-control" required>
+                            <small class="text-muted">24-hour format</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Appointment Type</label>
+                        <select id="type" name="type" class="form-select" required>
+                            <option value="">Select Type</option>
+                            <option value="Check-up">Check-up</option>
+                            <option value="Follow-up">Follow-up</option>
+                            <option value="Consultation">Consultation</option>
+                            <option value="New Patient">New Patient</option>
+                            <option value="Surgery Consult">Surgery Consult</option>
+                            <option value="Emergency">Emergency</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('appointments') }}" class="btn btn-light me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Create Appointment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+        
+        // Time validation
+        const timeInput = document.getElementById('time');
+        timeInput.addEventListener('change', function() {
+            const time = this.value;
+            const [hours] = time.split(':');
+            
+            // Check if time is within working hours (9 AM - 5 PM)
+            if (hours < 9 || hours >= 17) {
+                alert('Please select a time between 9:00 AM and 5:00 PM.');
+                this.value = '09:00'; // Reset to 9 AM
+            }
+        });
+    });
+</script>
+{% endblock %}
