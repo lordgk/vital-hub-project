@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import sqlite3
 import os
@@ -207,6 +206,65 @@ def patients():
     conn.close()
     
     return render_template('patients.html', patients=patients_data)
+
+@app.route('/create_patient', methods=['GET', 'POST'])
+def create_patient():
+    if request.method == 'POST':
+        # Generate a new patient ID
+        conn = sqlite3.connect('hospital.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM patients")
+        count = cursor.fetchone()[0] + 1
+        patient_id = f"P{count:03d}"
+        
+        # Get form data
+        name = request.form['name']
+        age = request.form['age']
+        gender = request.form['gender']
+        blood_type = request.form['blood_type']
+        address = request.form['address']
+        phone = request.form['phone']
+        email = request.form['email']
+        status = request.form['status']
+        medical_history = request.form['medical_history']
+        
+        # Current date for registration
+        registration_date = datetime.now().strftime("%Y-%m-%d")
+        
+        # Insert new patient
+        cursor.execute("""
+            INSERT INTO patients 
+            (id, name, age, gender, blood_type, address, phone, email, status, registration_date, medical_history)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            patient_id,
+            name,
+            age,
+            gender,
+            blood_type,
+            address,
+            phone,
+            email,
+            status,
+            registration_date,
+            medical_history
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        flash('Patient registered successfully!', 'success')
+        return redirect(url_for('patients'))
+    
+    # GET request - prepare for new patient form
+    conn = sqlite3.connect('hospital.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM patients")
+    count = cursor.fetchone()[0] + 1
+    new_id = f"P{count:03d}"
+    conn.close()
+    
+    return render_template('create_patient.html', new_id=new_id)
 
 @app.route('/doctors')
 def doctors():
