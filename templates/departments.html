@@ -6,22 +6,44 @@
 {% block header %}Departments{% endblock %}
 
 {% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="departmentSearch" placeholder="Search departments...">
+        </div>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="#" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> New Department
+        </a>
+    </div>
+</div>
+
 <div class="row g-4">
     {% if departments %}
-        {% for dept in departments %}
+        {% for department in departments %}
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">{{ department.name }}</h5>
+                        <span class="badge bg-primary">Active</span>
+                    </div>
                     <div class="card-body">
-                        <h5 class="card-title mb-1">{{ dept.name }}</h5>
-                        <p class="text-muted small mb-3">Head: {{ dept.head }}</p>
+                        <p class="card-text">{{ department.description }}</p>
                         
-                        <p class="mb-3">{{ dept.description }}</p>
+                        <div class="row text-center my-3">
+                            <div class="col">
+                                <h5 class="mb-0">{{ department.staff_count }}</h5>
+                                <small class="text-muted">Staff</small>
+                            </div>
+                        </div>
                         
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-light text-dark">
-                                <i class="bi bi-people me-1"></i> {{ dept.staff_count }} Staff
-                            </span>
-                            <button class="btn btn-sm btn-primary">View Details</button>
+                        <div class="d-flex justify-content-between mt-3">
+                            <small class="text-muted">Head: {{ department.head }}</small>
+                            <a href="{{ url_for('department_details', department_id=department.id) }}" class="btn btn-sm btn-primary">
+                                View Details
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -35,4 +57,27 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Department search functionality
+        const searchInput = document.getElementById('departmentSearch');
+        const departmentCards = document.querySelectorAll('.col-md-6.col-lg-4');
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            
+            departmentCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                if (cardText.includes(searchValue)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

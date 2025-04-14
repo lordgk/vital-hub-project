@@ -1,0 +1,93 @@
+
+{% extends 'base.html' %}
+
+{% block title %}New Doctor - VitalHub HMS{% endblock %}
+
+{% block header %}Register New Doctor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Doctor Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('create_doctor') }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="doctor_id" class="form-label">Doctor ID</label>
+                            <input type="text" id="doctor_id" name="doctor_id" class="form-control" value="{{ new_id }}" readonly>
+                            <small class="text-muted">Auto-generated ID</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="specialty" class="form-label">Specialty</label>
+                            <input type="text" id="specialty" name="specialty" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="department" class="form-label">Department</label>
+                            <select id="department" name="department" class="form-select" required>
+                                <option value="">Select Department</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Dermatology">Dermatology</option>
+                                <option value="General Medicine">General Medicine</option>
+                                <option value="Ophthalmology">Ophthalmology</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="qualification" class="form-label">Qualification</label>
+                            <input type="text" id="qualification" name="qualification" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="experience" class="form-label">Experience (years)</label>
+                            <input type="number" id="experience" name="experience" class="form-control" required min="0" max="50">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="schedule" class="form-label">Schedule</label>
+                        <input type="text" id="schedule" name="schedule" class="form-control" 
+                               placeholder="e.g. Mon 9-5, Wed 9-5, Fri 9-1" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Profile Image URL</label>
+                        <input type="text" id="image" name="image" class="form-control" 
+                               value="https://picsum.photos/id/{{ range(170, 180) | random }}/200">
+                        <small class="text-muted">Default placeholder image provided</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('doctors') }}" class="btn btn-light me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Register Doctor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,26 +1,26 @@
 
 {% extends 'base.html' %}
 
-{% block title %}New Appointment - VitalHub HMS{% endblock %}
+{% block title %}Edit Appointment - VitalHub HMS{% endblock %}
 
-{% block header %}Create New Appointment{% endblock %}
+{% block header %}Edit Appointment{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Appointment Details</h5>
+                <h5 class="card-title mb-0">Edit Appointment #{{ appointment.id }}</h5>
             </div>
             <div class="card-body">
-                <form method="post" action="{{ url_for('create_appointment') }}">
+                <form method="post" action="{{ url_for('edit_appointment', appointment_id=appointment.id) }}">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="patient" class="form-label">Patient</label>
                             <select id="patient" name="patient_id" class="form-select" required>
                                 <option value="">Select Patient</option>
                                 {% for patient in patients %}
-                                    <option value="{{ patient.id }}" {% if preselected_patient and preselected_patient == patient.id %}selected{% endif %}>
+                                    <option value="{{ patient.id }}" {% if patient.id == appointment.patient_id %}selected{% endif %}>
                                         {{ patient.name }}
                                     </option>
                                 {% endfor %}
@@ -31,7 +31,7 @@
                             <select id="doctor" name="doctor_id" class="form-select" required>
                                 <option value="">Select Doctor</option>
                                 {% for doctor in doctors %}
-                                    <option value="{{ doctor.id }}" {% if preselected_doctor and preselected_doctor == doctor.id %}selected{% endif %}>
+                                    <option value="{{ doctor.id }}" {% if doctor.id == appointment.doctor_id %}selected{% endif %}>
                                         {{ doctor.name }} ({{ doctor.specialty }})
                                     </option>
                                 {% endfor %}
@@ -42,11 +42,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="date" class="form-label">Date</label>
-                            <input type="date" id="date" name="date" class="form-control" required>
+                            <input type="date" id="date" name="date" class="form-control" value="{{ appointment.date }}" required>
                         </div>
                         <div class="col-md-6">
                             <label for="time" class="form-label">Time</label>
-                            <input type="time" id="time" name="time" class="form-control" required>
+                            <input type="time" id="time" name="time" class="form-control" value="{{ appointment.time.replace(' AM', '').replace(' PM', '') }}" required>
                             <small class="text-muted">24-hour format</small>
                         </div>
                     </div>
@@ -55,23 +55,23 @@
                         <label for="type" class="form-label">Appointment Type</label>
                         <select id="type" name="type" class="form-select" required>
                             <option value="">Select Type</option>
-                            <option value="Check-up">Check-up</option>
-                            <option value="Follow-up">Follow-up</option>
-                            <option value="Consultation">Consultation</option>
-                            <option value="New Patient">New Patient</option>
-                            <option value="Surgery Consult">Surgery Consult</option>
-                            <option value="Emergency">Emergency</option>
+                            <option value="Check-up" {% if appointment.type == 'Check-up' %}selected{% endif %}>Check-up</option>
+                            <option value="Follow-up" {% if appointment.type == 'Follow-up' %}selected{% endif %}>Follow-up</option>
+                            <option value="Consultation" {% if appointment.type == 'Consultation' %}selected{% endif %}>Consultation</option>
+                            <option value="New Patient" {% if appointment.type == 'New Patient' %}selected{% endif %}>New Patient</option>
+                            <option value="Surgery Consult" {% if appointment.type == 'Surgery Consult' %}selected{% endif %}>Surgery Consult</option>
+                            <option value="Emergency" {% if appointment.type == 'Emergency' %}selected{% endif %}>Emergency</option>
                         </select>
                     </div>
                     
                     <div class="mb-3">
                         <label for="notes" class="form-label">Notes</label>
-                        <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+                        <textarea id="notes" name="notes" class="form-control" rows="3">{{ appointment.notes }}</textarea>
                     </div>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ url_for('appointments') }}" class="btn btn-light me-md-2">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Create Appointment</button>
+                        <a href="{{ url_for('appointment_details', appointment_id=appointment.id) }}" class="btn btn-light me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
             </div>
@@ -83,12 +83,33 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Set default date to today
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('date').value = today;
-        
-        // Time validation
+        // Time validation and conversion from 12-hour to 24-hour format
         const timeInput = document.getElementById('time');
+        
+        // Parse appointment time
+        const appointmentTime = "{{ appointment.time }}";
+        const timeMatch = appointmentTime.match(/(\d+):(\d+)\s+(AM|PM)/i);
+        
+        if (timeMatch) {
+            let hours = parseInt(timeMatch[1]);
+            const minutes = timeMatch[2];
+            const meridiem = timeMatch[3].toUpperCase();
+            
+            // Convert to 24-hour format
+            if (meridiem === 'PM' && hours < 12) {
+                hours += 12;
+            } else if (meridiem === 'AM' && hours === 12) {
+                hours = 0;
+            }
+            
+            // Format hours to ensure 2 digits
+            const formattedHours = hours.toString().padStart(2, '0');
+            
+            // Set the value
+            timeInput.value = `${formattedHours}:${minutes}`;
+        }
+        
+        // Time validation for working hours
         timeInput.addEventListener('change', function() {
             const time = this.value;
             const [hours] = time.split(':');
@@ -99,11 +120,6 @@
                 this.value = '09:00'; // Reset to 9 AM
             }
         });
-        
-        // Set default time to 9:00 AM
-        if (!timeInput.value) {
-            timeInput.value = '09:00';
-        }
     });
 </script>
 {% endblock %}

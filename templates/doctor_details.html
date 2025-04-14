@@ -1,0 +1,137 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Doctor Profile - VitalHub HMS{% endblock %}
+
+{% block header %}Doctor Profile{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <img src="{{ doctor.image }}" class="rounded-circle me-3" width="80" height="80" alt="{{ doctor.name }}">
+                <div>
+                    <h2 class="mb-0">{{ doctor.name }}</h2>
+                    <p class="text-primary mb-0">{{ doctor.specialty }} | {{ doctor.department }}</p>
+                </div>
+            </div>
+            <div>
+                <a href="{{ url_for('edit_doctor', doctor_id=doctor.id) }}" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil me-1"></i> Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Professional Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column">
+                    <div class="mb-3 d-flex">
+                        <div class="text-muted" style="width: 120px;">Doctor ID:</div>
+                        <div class="fw-bold">{{ doctor.id }}</div>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <div class="text-muted" style="width: 120px;">Qualification:</div>
+                        <div>{{ doctor.qualification }}</div>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <div class="text-muted" style="width: 120px;">Experience:</div>
+                        <div>{{ doctor.experience }} years</div>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <div class="text-muted" style="width: 120px;">Department:</div>
+                        <div>{{ doctor.department }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Contact Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column">
+                    <div class="mb-3 d-flex">
+                        <div class="text-muted" style="width: 120px;">Email:</div>
+                        <div>{{ doctor.email }}</div>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <div class="text-muted" style="width: 120px;">Phone:</div>
+                        <div>{{ doctor.phone }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Schedule</h5>
+            </div>
+            <div class="card-body">
+                <div class="bg-light p-3 rounded">
+                    <p class="mb-0">{{ doctor.schedule }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Upcoming Appointments</h5>
+                <a href="{{ url_for('create_appointment') }}?doctor_id={{ doctor.id }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Schedule Appointment
+                </a>
+            </div>
+            <div class="card-body">
+                {% if appointments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Patient</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                            <tr>
+                                <td>{{ appointment.date }}</td>
+                                <td>{{ appointment.time }}</td>
+                                <td>{{ appointment.patient_name }}</td>
+                                <td>{{ appointment.type }}</td>
+                                <td><span class="badge bg-{{ appointment.status | replace('completed', 'success') | replace('scheduled', 'primary') | replace('cancelled', 'danger') | replace('no-show', 'warning') }}">{{ appointment.status }}</span></td>
+                                <td>
+                                    <a href="{{ url_for('appointment_details', appointment_id=appointment.id) }}" class="btn btn-sm btn-outline-secondary">Details</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">No upcoming appointments found for this doctor.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
