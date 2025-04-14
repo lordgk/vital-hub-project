@@ -27,6 +27,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -43,6 +51,8 @@ const Appointments = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
   // Filter appointments based on search query, status filter, and date filter
@@ -65,10 +75,21 @@ const Appointments = () => {
     });
   };
 
-  const handleViewDetails = (id: string) => {
+  const handleViewDetails = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setIsDialogOpen(true);
+  };
+
+  const updateAppointmentStatus = (id: string, newStatus: string) => {
+    setAppointments(appointments.map(appointment => 
+      appointment.id === id ? { ...appointment, status: newStatus as Appointment["status"] } : appointment
+    ));
+    
+    setIsDialogOpen(false);
+    
     toast({
-      title: "Appointment Details",
-      description: `Viewing details for appointment ID: ${id}`,
+      title: "Status Updated",
+      description: `Appointment status changed to ${newStatus}`,
     });
   };
 
@@ -188,7 +209,7 @@ const Appointments = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleViewDetails(appointment.id)}
+                        onClick={() => handleViewDetails(appointment)}
                       >
                         View
                       </Button>
@@ -206,6 +227,97 @@ const Appointments = () => {
           </Table>
         </div>
       </div>
+
+      {/* Appointment Details Dialog with Status Update */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Appointment Details</DialogTitle>
+            <DialogDescription>
+              View and manage appointment information
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedAppointment && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">Patient</h3>
+                  <p className="mt-1">{selectedAppointment.patientName}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">Doctor</h3>
+                  <p className="mt-1">{selectedAppointment.doctorName}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">Date</h3>
+                  <p className="mt-1">{selectedAppointment.date}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">Time</h3>
+                  <p className="mt-1">{selectedAppointment.time}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">Type</h3>
+                  <p className="mt-1">{selectedAppointment.type}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">Status</h3>
+                  <p className="mt-1">
+                    <Badge className={statusStyles[selectedAppointment.status]}>
+                      {selectedAppointment.status}
+                    </Badge>
+                  </p>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-medium text-gray-500">Change Status</h3>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="bg-blue-100 text-blue-800 hover:bg-blue-200"
+                    onClick={() => updateAppointmentStatus(selectedAppointment.id, "scheduled")}
+                  >
+                    Scheduled
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="bg-green-100 text-green-800 hover:bg-green-200"
+                    onClick={() => updateAppointmentStatus(selectedAppointment.id, "completed")}
+                  >
+                    Completed
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="bg-red-100 text-red-800 hover:bg-red-200"
+                    onClick={() => updateAppointmentStatus(selectedAppointment.id, "cancelled")}
+                  >
+                    Cancelled
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="bg-amber-100 text-amber-800 hover:bg-amber-200"
+                    onClick={() => updateAppointmentStatus(selectedAppointment.id, "no-show")}
+                  >
+                    No-Show
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 };
