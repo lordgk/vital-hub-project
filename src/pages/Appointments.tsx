@@ -81,14 +81,23 @@ const Appointments = () => {
   };
 
   const updateAppointmentStatus = (id: string, newStatus: string) => {
-    setAppointments(prevAppointments => 
-      prevAppointments.map(appointment => 
-        appointment.id === id ? { ...appointment, status: newStatus as Appointment["status"] } : appointment
-      )
+    // Log the action to help with debugging
+    console.log(`Updating appointment ${id} to status: ${newStatus}`);
+    
+    // Create a new array with the updated appointment
+    const updatedAppointments = appointments.map(appointment => 
+      appointment.id === id 
+        ? { ...appointment, status: newStatus as Appointment["status"] } 
+        : appointment
     );
     
+    // Update the state with the new array
+    setAppointments(updatedAppointments);
+    
+    // Close the dialog
     setIsDialogOpen(false);
     
+    // Show a success toast
     toast({
       title: "Status Updated",
       description: `Appointment status changed to ${newStatus}`,
