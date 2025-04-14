@@ -81,9 +81,11 @@ const Appointments = () => {
   };
 
   const updateAppointmentStatus = (id: string, newStatus: string) => {
-    setAppointments(appointments.map(appointment => 
-      appointment.id === id ? { ...appointment, status: newStatus as Appointment["status"] } : appointment
-    ));
+    setAppointments(prevAppointments => 
+      prevAppointments.map(appointment => 
+        appointment.id === id ? { ...appointment, status: newStatus as Appointment["status"] } : appointment
+      )
+    );
     
     setIsDialogOpen(false);
     
@@ -94,7 +96,7 @@ const Appointments = () => {
   };
 
   return (
-    <MainLayout title="Appointment Management">
+    <MainLayout>
       <div className="space-y-6">
         {/* Header and Actions */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
