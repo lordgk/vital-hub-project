@@ -1,0 +1,80 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Medical Record Details - VitalHub HMS{% endblock %}
+
+{% block header %}Medical Record #{{ record.id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">{{ record.record_type }}</h5>
+                <span class="badge bg-{{ record.status | replace('complete', 'success') | replace('pending', 'warning') }}">
+                    {{ record.status.capitalize() }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-muted mb-2">Patient</h6>
+                        <p class="mb-1"><strong>{{ record.patient_name }}</strong></p>
+                        <p class="mb-0 small">ID: {{ record.patient_id }}</p>
+                        <a href="{{ url_for('patient_details', patient_id=record.patient_id) }}" class="btn btn-sm btn-link p-0 mt-1">
+                            View Patient Profile
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-muted mb-2">Department</h6>
+                        <p class="mb-0">{{ record.department }}</p>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-muted mb-2">Date</h6>
+                        <p class="mb-0">{{ record.date }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-muted mb-2">Doctor</h6>
+                        <p class="mb-0">{{ record.doctor }}</p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">Record Details</h6>
+                    <div class="bg-light p-3 rounded">
+                        {% if record.record_type == 'Lab Results' %}
+                            <p>Sample Type: Blood</p>
+                            <p>Results: Normal ranges</p>
+                            <p>Comments: No abnormalities detected</p>
+                        {% elif record.record_type == 'X-Ray' %}
+                            <p>Body Part: Chest</p>
+                            <p>Findings: Clear lung fields</p>
+                        {% elif record.record_type == 'MRI Scan' %}
+                            <p>Body Part: Brain</p>
+                            <p>Findings: No pathological findings</p>
+                        {% elif record.record_type == 'Prescription' %}
+                            <p>Medication: Paracetamol 500mg</p>
+                            <p>Dosage: 1-2 tablets every 6 hours as needed</p>
+                            <p>Duration: 5 days</p>
+                        {% else %}
+                            <p>No detailed information available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    {% if record.status == 'pending' %}
+                    <form method="post" action="{{ url_for('update_record_status', record_id=record.id, status='complete') }}" class="me-md-2">
+                        <button type="submit" class="btn btn-success">Mark as Complete</button>
+                    </form>
+                    {% endif %}
+                    <a href="{{ url_for('records') }}" class="btn btn-primary">Back to Records</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

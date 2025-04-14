@@ -645,6 +645,45 @@ def departments():
     
     return render_template('departments.html', departments=departments_data)
 
+@app.route('/create_department', methods=['GET', 'POST'])
+def create_department():
+    if request.method == 'POST':
+        # Generate a new department ID
+        conn = sqlite3.connect('hospital.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM departments")
+        count = cursor.fetchone()[0] + 1
+        department_id = f"DEPT{count:03d}"
+        
+        # Insert new department
+        cursor.execute("""
+            INSERT INTO departments 
+            (id, name, head, description, staff_count)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            department_id,
+            request.form['name'],
+            request.form['head'],
+            request.form['description'],
+            request.form['staff_count']
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        flash('Department created successfully!', 'success')
+        return redirect(url_for('departments'))
+    
+    # GET request - prepare for new department form
+    conn = sqlite3.connect('hospital.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM departments")
+    count = cursor.fetchone()[0] + 1
+    new_id = f"DEPT{count:03d}"
+    conn.close()
+    
+    return render_template('create_department.html', new_id=new_id)
+
 @app.route('/department/<department_id>')
 def department_details(department_id):
     conn = sqlite3.connect('hospital.db')
@@ -672,6 +711,40 @@ def department_details(department_id):
                           department=department,
                           doctors=doctors,
                           activities=activities)
+
+@app.route('/edit_department/<department_id>', methods=['GET', 'POST'])
+def edit_department(department_id):
+    conn = sqlite3.connect('hospital.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    if request.method == 'POST':
+        # Update department information
+        cursor.execute("""
+            UPDATE departments 
+            SET name = ?, head = ?, description = ?, staff_count = ?
+            WHERE id = ?
+        """, (
+            request.form['name'],
+            request.form['head'],
+            request.form['description'],
+            request.form['staff_count'],
+            department_id
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        flash('Department information updated successfully!', 'success')
+        return redirect(url_for('department_details', department_id=department_id))
+    
+    # Get department details for the form
+    cursor.execute("SELECT * FROM departments WHERE id = ?", (department_id,))
+    department = dict(cursor.fetchone())
+    
+    conn.close()
+    
+    return render_template('edit_department.html', department=department)
 
 @app.route('/records')
 def records():
@@ -710,6 +783,34 @@ def records():
     conn.close()
     
     return render_template('records.html', records=records_data, search_query=search_query, record_type=record_type)
+
+@app.route('/record/<record_id>')
+def record_details(record_id):
+    conn = sqlite3.connect('hospital.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    # Get record details
+    cursor.execute("SELECT * FROM medical_records WHERE id = ?", (record_id,))
+    record = dict(cursor.fetchone())
+    
+    conn.close()
+    
+    return render_template('record_details.html', record=record)
+
+@app.route('/record/<record_id>/status/<status>', methods=['POST'])
+def update_record_status(record_id, status):
+    conn = sqlite3.connect('hospital.db')
+    cursor = conn.cursor()
+    
+    # Update record status
+    cursor.execute("UPDATE medical_records SET status = ? WHERE id = ?", (status, record_id))
+    
+    conn.commit()
+    conn.close()
+    
+    flash(f'Record has been marked as {status}!', 'success')
+    return redirect(url_for('record_details', record_id=record_id))
 
 @app.route('/analytics')
 def analytics():

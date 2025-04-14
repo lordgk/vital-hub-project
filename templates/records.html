@@ -74,9 +74,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ url_for('record_details', record_id=record.id) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-file-earmark-text"></i>
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
                         {% endfor %}
